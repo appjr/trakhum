@@ -1,4 +1,4 @@
-package sample;
+package trakhum;
 
 public class Controller {
 }
