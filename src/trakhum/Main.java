@@ -7,7 +7,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        new MainView(primaryStage);
+        MainView mainView = new MainView(primaryStage);
+        Controller controller = new Controller();
+        controller.startProcessing(mainView);
     }
 
 
