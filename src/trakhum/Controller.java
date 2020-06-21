@@ -32,9 +32,9 @@ public class Controller {
     public void updateDataOnView(String[] data){
         if(data!=null){
             String id = data[0];
-            if (id1 == null) {
+            if (id1 == null ) {
                 id1 = id;
-            } else if (id2 == null) {
+            } else if (id2 == null && !id1.equals(id)) {
                 id2 = id;
             }
             if (id.equals(id1)) {
@@ -50,8 +50,8 @@ public class Controller {
     }
 
     public void updateLog(String str){
-        //mainView.updateLog(msgCount+ ":::"+str);
-        writeToFile(msgCount+ ":::"+str);
+        mainView.updateLog(msgCount+ ":::"+str);
+        //writeToFile(msgCount+ ":::"+str);
         msgCount++;
     }
 

@@ -11,6 +11,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Vector;
 
 public class UdpServer extends Thread {
 
@@ -19,6 +20,7 @@ public class UdpServer extends Thread {
     private byte[] buf = new byte[256];
     private static int portNumber = 9000;
     Controller controller;
+    Vector dataIn = new Vector<String>();
 
     public UdpServer(Controller controller) throws SocketException {
         this.controller = controller;
@@ -29,7 +31,6 @@ public class UdpServer extends Thread {
     public void run() {
         running = true;
         logInfo("Starting UDP Server "+getLocalIpAddress()+" on port "+portNumber);
-
         while (running) {
             DatagramPacket packet
                     = new DatagramPacket(buf, buf.length);
@@ -44,17 +45,25 @@ public class UdpServer extends Thread {
             packet = new DatagramPacket(buf, buf.length, address, port);
             String received
                     = new String(packet.getData(), 0, packet.getLength());
-            sendUpdatedData(received);
+            dataIn.add(received);
+            sendUpdatedDataToUI();
         }
         socket.close();
     }
 
-    private void sendUpdatedData(String received) {
+    private void sendUpdatedDataToUI() {
         Platform.runLater(new Runnable(){
             @Override
             public void run() {
-                updateData(parseText(received));
-                logInfo(received);
+                String lastReceived = (String)dataIn.lastElement();
+                String [] fields = parseText(lastReceived);
+                updateData(fields);
+                logInfo(lastReceived);
+                try {
+                    sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -71,14 +80,18 @@ public class UdpServer extends Thread {
         String fields[] = text.split(",");
         if(fields!=null && fields.length>=4) {
             try {
-                //String toSplit = fields[0];
-                String id = fields[0];//toSplit.split("\\.")[0];
-                return new String[]{id, fields[1], fields[2], fields[3]};
+                String toSplit = fields[0];
+                String id = toSplit.split("\\.")[0];
+                if(id!=null && id.length()>=13) {
+                    id = id.substring(0,12);
+                    return new String[]{id, fields[7], fields[8], fields[9]};
+                }
             } catch (Exception e){
                 System.out.println("Problem with data: "+ text);
                 return null;
             }
-        } else return null;
+        }
+        return null;
     }
 
     public static String getLocalIpAddress() {

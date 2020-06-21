@@ -83,7 +83,7 @@ public class MainView {
     }
 
     public void updateLog(String line){
-        logView.appendText("\n"+line);
+        logView.appendText(line);
     }
 
     public void updateDataSet1(String [] data){
