@@ -7,6 +7,9 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -14,7 +17,7 @@ import java.io.IOException;
 
 public class MainView {
 
-    GridPane gridPane;
+    GridPane dataPane;
     TextArea logView;
     String [] ids = new String[2];
     Label id1;
@@ -26,14 +29,21 @@ public class MainView {
     Label y2;
     Label z2;
     public MainView(Stage primaryStage) throws IOException {
-        gridPane = getGridPane();
+        dataPane = getGridPane();
         setupLogView();
 
-        SplitPane splitPane = new SplitPane();
-        splitPane.setOrientation(Orientation.VERTICAL);
-        splitPane.getItems().addAll(gridPane,logView);
+        SplitPane horizontalDataPane = new SplitPane();
+        horizontalDataPane.setOrientation(Orientation.VERTICAL);
+        horizontalDataPane.getItems().addAll(dataPane,logView);
 
-        primaryStage.setScene(new Scene(splitPane, 300, 275));
+        SplitPane verticalMainPane = new SplitPane();
+        verticalMainPane.setOrientation(Orientation.HORIZONTAL);
+        Area3D stage3d = buildAxes();
+        verticalMainPane.getItems().addAll(stage3d,horizontalDataPane);
+
+        primaryStage.setScene(new Scene(verticalMainPane, 300, 275));
+
+
         primaryStage.show();
     }
 
@@ -100,5 +110,34 @@ public class MainView {
         z2.setText(data[3]);
     }
 
+    private Area3D buildAxes() {
+        Area3D world = new Area3D();
+        final Area3D axisGroup = new Area3D();
+        double AXIS_LENGTH = 250.0;
+        final PhongMaterial redMaterial = new PhongMaterial();
+        redMaterial.setDiffuseColor(Color.DARKRED);
+        redMaterial.setSpecularColor(Color.RED);
+
+        final PhongMaterial greenMaterial = new PhongMaterial();
+        greenMaterial.setDiffuseColor(Color.DARKGREEN);
+        greenMaterial.setSpecularColor(Color.GREEN);
+
+        final PhongMaterial blueMaterial = new PhongMaterial();
+        blueMaterial.setDiffuseColor(Color.DARKBLUE);
+        blueMaterial.setSpecularColor(Color.BLUE);
+
+        final Box xAxis = new Box(AXIS_LENGTH, 1, 1);
+        final Box yAxis = new Box(1, AXIS_LENGTH, 1);
+        final Box zAxis = new Box(1, 1, AXIS_LENGTH);
+
+        xAxis.setMaterial(redMaterial);
+        yAxis.setMaterial(greenMaterial);
+        zAxis.setMaterial(blueMaterial);
+
+        axisGroup.getChildren().addAll(xAxis, yAxis, zAxis);
+        axisGroup.setVisible(true);
+        world.getChildren().addAll(axisGroup);
+        return world;
+    }
 
 }
